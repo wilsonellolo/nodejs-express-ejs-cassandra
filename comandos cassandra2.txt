@@ -1,0 +1,67 @@
+instalando docker
+apt-get update
+apt-get install docker.io
+
+instalando la imagen de cassandra en la imagen en la maquina 
+docker pull cassandra
+docker images
+sudo mkdir /var/lib/container_data
+sudo mkdir /var/lib/container_data/cassandra-node-01
+sudo mkdir /var/lib/container_data/cassandra-node-02
+sudo mkdir /var/lib/container_data/cassandra-node-03
+
+corriendo contenedores de cassandra
+docker run  --name cassandra-node-01 -d -p 9042:9042 \
+-e CASSANDRA_CLUSTER_NAME="docker_test" \
+-e CASSANDRA_NUM_TOKENS="8" \
+-e CASSANDRA_DC="dcl" \
+-e CASSANDRA_RACK="rack1" \
+-e CASSANDRA_ENDPOINT_SNITCH="GossipingPropertyFileSnitch" \
+-v /var/lib/container_data/cassandra-node-01:/var/lib/cassandra/data \
+cassandra:latest
+
+
+docker run  --name cassandra-node-02 -d -p 9041:9042 \
+-e CASSANDRA_CLUSTER_NAME="docker_test" \
+-e CASSANDRA_NUM_TOKENS="8" \
+-e CASSANDRA_DC="dcl" \
+-e CASSANDRA_RACK="rack2" \
+-e CASSANDRA_ENDPOINT_SNITCH="GossipingPropertyFileSnitch" \
+-e CASSANDRA_SEEDS="$(docker inspect --format='{{ .NetworkSettings.IPAddress}}' cassandra-node-01)" \
+-v /var/lib/container_data/cassandra-node-02:/var/lib/cassandra/data \
+cassandra:latest
+
+docker run  --name cassandra-node-03 -d -p 9199:7199 \
+-e CASSANDRA_CLUSTER_NAME="docker_test" \
+-e CASSANDRA_NUM_TOKENS="8" \
+-e CASSANDRA_DC="dcl" \
+-e CASSANDRA_RACK="rack3" \
+-e CASSANDRA_ENDPOINT_SNITCH="GossipingPropertyFileSnitch" \
+-e CASSANDRA_SEEDS="$(docker inspect --format='{{ .NetworkSettings.IPAddress}}' cassandra-node-01)" \
+-v /var/lib/container_data/cassandra-node-03:/var/lib/cassandra/data \
+cassandra:3.11
+
+
+ingresar al container
+docker exec -it idContainer cqlsh
+
+
+CREATE KEYSPACE prueba WITH replication = {'class': 'SimpleStrategy','replication_factor' : 1};
+
+CREATE KEYSPACE practica WITH replication = {'class': 'SimpleStrategy','replication_factor' : 1};
+use practica;
+create table nombre(titulo text);
+create table ticket(titulo text,fecha date,correo text, descripcion text,primary key (titulo,fecha));
+copy ticket(titulo,fecha,correo,descripcion) from '/home/carga.csv';
+
+
+rango de fechas
+select * from ticket where fecha>'2020-03-24' and fecha<'2020-03-30' allow filtering;
+
+ticket por usuario por rango de fechas
+select * from ticket where correo = 'correo6@gmail.com' and fecha>'21-03-24' and fecha<'2020-03-30' allow filtering;
+
+
+
+prueba con tabla llamada prueba en el mismo keyspace
+
