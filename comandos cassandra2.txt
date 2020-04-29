@@ -39,7 +39,7 @@ docker run  --name cassandra-node-03 -d -p 9199:7199 \
 -e CASSANDRA_ENDPOINT_SNITCH="GossipingPropertyFileSnitch" \
 -e CASSANDRA_SEEDS="$(docker inspect --format='{{ .NetworkSettings.IPAddress}}' cassandra-node-01)" \
 -v /var/lib/container_data/cassandra-node-03:/var/lib/cassandra/data \
-cassandra:3.11
+cassandra:latest
 
 
 ingresar al container
