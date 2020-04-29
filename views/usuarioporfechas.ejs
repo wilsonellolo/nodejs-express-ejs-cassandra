@@ -44,12 +44,14 @@
             <th>Titulo del ticket</th>
             <th>Descripción el ticket</th>
         </tr>
-        <tr>
-            <td>Fecha deasddddsd  dddddddddsadddddddddd dl ticket</td>
-            <td>Correo del ussdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaauario solicitante</td>
-            <td>Titulo del ticket</td>
-            <td>Descripciasdasd as asd asd ón el ticket</td>
-        </tr>
+        <% if(result.rows) { for (var i=0; i<result.rows.length; i++) { %>
+            <tr>
+                <td><%=result.rows[i].fecha.year%>-<%=result.rows[i].fecha.month%>-<%=result.rows[i].fecha.day%></td>
+                <td><%=result.rows[i].correo%></td>
+                <td><%=result.rows[i].titulo%></td>
+                <td><%=result.rows[i].descripcion%></td>
+            </tr>
+        <%}}%>
     </table>
    
 </body>
